@@ -373,7 +373,12 @@ function buildLlmRequest(original, typed) {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + settings.deepseekKey,
       },
-      body: Object.assign({}, base, { model: settings.deepseekModel }),
+      // deepseek-v4 defaults to thinking mode, which returns reasoning_content
+      // and can leave content empty; disabled makes it answer directly.
+      body: Object.assign({}, base, {
+        model: settings.deepseekModel,
+        thinking: { type: 'disabled' },
+      }),
     };
   }
   const headers = { 'Content-Type': 'application/json' };
@@ -724,7 +729,7 @@ btnSubmit.addEventListener('click', async () => {
     console.warn('blurt: LLM compare failed, falling back to word diff', err);
     result = compare(sourceText, typedTextEl.value);
     mode = 'token';
-    note = 'Model unavailable — showing word-level comparison.';
+    note = 'Model unavailable (' + err.message + ') — showing word-level comparison.';
   } finally {
     btnSubmit.disabled = false;
     submitHint.hidden = true;
