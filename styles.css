@@ -1,0 +1,285 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #1f2933;
+  background: #f5f6f8;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 2rem;
+}
+
+.tagline {
+  margin: 0 0 24px;
+  color: #616e7c;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #dde2e8;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.card h2 {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+}
+
+.card h3 {
+  margin: 20px 0 6px;
+  font-size: 0.95rem;
+  color: #616e7c;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: #616e7c;
+}
+
+textarea {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  border: 1px solid #c3cdd7;
+  border-radius: 6px;
+  padding: 10px 12px;
+  resize: vertical;
+  background: #fff;
+}
+
+textarea:focus {
+  outline: 2px solid #7aa5e8;
+  outline-offset: -1px;
+  border-color: #7aa5e8;
+}
+
+.notice {
+  margin: 0 0 12px;
+  font-style: italic;
+  color: #616e7c;
+}
+
+/* Saved texts */
+.saved-row,
+.saved-save-row,
+.saved-tools-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+#savedSelect,
+#saveLabel {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: inherit;
+  border: 1px solid #c3cdd7;
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+#savedSelect:focus,
+#saveLabel:focus {
+  outline: 2px solid #7aa5e8;
+  outline-offset: -1px;
+  border-color: #7aa5e8;
+}
+
+#btnSave,
+#btnDeleteSaved {
+  flex-shrink: 0;
+}
+
+#saveHint {
+  margin: 8px 0 0;
+  color: #b3382c;
+  font-size: 0.9rem;
+}
+
+#saveHint.ok {
+  color: #2e7d32;
+}
+
+/* Model provider settings */
+.settings-fields select,
+.settings-fields input[type="text"],
+.settings-fields input[type="password"] {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  border: 1px solid #c3cdd7;
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: #fff;
+  margin-bottom: 10px;
+}
+
+.settings-fields select:focus,
+.settings-fields input[type="text"]:focus,
+.settings-fields input[type="password"]:focus {
+  outline: 2px solid #7aa5e8;
+  outline-offset: -1px;
+  border-color: #7aa5e8;
+}
+
+#settingsHint {
+  margin: 8px 0 0;
+  color: #b3382c;
+  font-size: 0.9rem;
+}
+
+#settingsHint.ok {
+  color: #2e7d32;
+}
+
+.timer-row {
+  margin-bottom: 12px;
+}
+
+#timer {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.6em;
+  font-weight: 600;
+}
+
+#submitHint {
+  margin: 8px 0 0;
+  color: #b3382c;
+  font-size: 0.9rem;
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  font: inherit;
+  padding: 8px 16px;
+  border: 1px solid #8a97a5;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1f2933;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #f0f3f6;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button.secondary {
+  border-color: #c3cdd7;
+  color: #52606d;
+}
+
+/* Diff rendering */
+.diff {
+  line-height: 1.8;
+  word-spacing: 0.15em;
+  margin: 0;
+  padding: 12px;
+  background: #fafbfc;
+  border: 1px solid #eef1f4;
+  border-radius: 6px;
+}
+
+.w-miss {
+  background: #fde8e8;
+  text-decoration: line-through;
+}
+
+.w-extra {
+  background: #fdf6d8;
+}
+
+/* History */
+.history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.history-head h2 {
+  margin: 0;
+}
+
+.history-group {
+  margin-bottom: 16px;
+}
+
+.history-group:last-child {
+  margin-bottom: 0;
+}
+
+.history-header {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #dde2e8;
+  background: #f7f9fb;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.history-header:hover {
+  background: #eef1f4;
+}
+
+.history-attempts {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: #52606d;
+}
+
+.history-delete {
+  border: none;
+  background: none;
+  padding: 2px 8px;
+  font-size: 1rem;
+  line-height: 1;
+  color: #9aa5b1;
+  cursor: pointer;
+}
+
+.history-delete:hover {
+  color: #b3382c;
+  background: none;
+}

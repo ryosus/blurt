@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blurt — memorisation practice</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="container">
+  <h1>Blurt</h1>
+  <p class="tagline">Paste text, type it from memory, compare.</p>
+
+  <section id="practiceCard" class="card">
+    <div id="viewSetup">
+      <h2>Start</h2>
+      <label for="sourceText">Text to memorise</label>
+      <textarea id="sourceText" rows="8" placeholder="Paste or type the text you want to practise…"></textarea>
+      <div class="saved-row">
+        <select id="savedSelect">
+          <option value="">— Saved texts —</option>
+        </select>
+        <button id="btnDeleteSaved" type="button" class="secondary" title="Delete selected saved text" disabled>×</button>
+      </div>
+      <div class="saved-save-row">
+        <input id="saveLabel" type="text" placeholder="Label for this text (e.g. Biology — mitochondria)">
+        <button id="btnSave" type="button">Save text</button>
+      </div>
+      <div class="saved-tools-row">
+        <button id="btnExport" type="button" class="secondary">Export texts</button>
+        <button id="btnImport" type="button" class="secondary">Import texts</button>
+        <input id="importFile" type="file" accept=".json,application/json" hidden>
+      </div>
+      <p id="saveHint" hidden></p>
+      <button id="btnStart" type="button" disabled>Start practice</button>
+    </div>
+
+    <div id="viewPractice" hidden>
+      <p class="notice">Text hidden — type it out from memory.</p>
+      <div class="timer-row"><span id="timer">00:00.0</span></div>
+      <textarea id="typedText" rows="8" placeholder="Type the text from memory…"></textarea>
+      <p id="submitHint" hidden>Type something first.</p>
+      <div class="actions">
+        <button id="btnSubmit" type="button">Submit</button>
+        <button id="btnBack" type="button" class="secondary">Back</button>
+      </div>
+    </div>
+
+    <div id="viewResult" hidden>
+      <p id="summary"></p>
+      <h3>Original</h3>
+      <p id="originalOut" class="diff"></p>
+      <h3>Typed</h3>
+      <p id="typedOut" class="diff"></p>
+      <div class="actions">
+        <button id="btnAgain" type="button">Try again</button>
+        <button id="btnNew" type="button" class="secondary">New text</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="modelCard" class="card">
+    <h2>Model provider</h2>
+    <div class="settings-fields">
+      <label for="providerSelect">Provider</label>
+      <select id="providerSelect">
+        <option value="local">Local llama.cpp</option>
+        <option value="deepseek">DeepSeek API</option>
+        <option value="custom">Custom (OpenAI-compatible)</option>
+      </select>
+      <div id="localFields">
+        <label for="localUrl">Endpoint URL</label>
+        <input id="localUrl" type="text" placeholder="http://192.168.15.115:8080/v1/chat/completions">
+      </div>
+      <div id="deepseekFields" hidden>
+        <label for="deepseekKey">API key</label>
+        <input id="deepseekKey" type="password" placeholder="sk-…">
+        <label for="deepseekModel">Model</label>
+        <input id="deepseekModel" type="text" placeholder="deepseek-v4-flash">
+      </div>
+      <div id="customFields" hidden>
+        <label for="customUrl">Endpoint URL</label>
+        <input id="customUrl" type="text" placeholder="https://…/v1/chat/completions">
+        <label for="customKey">API key (optional)</label>
+        <input id="customKey" type="password">
+        <label for="customModel">Model</label>
+        <input id="customModel" type="text">
+      </div>
+    </div>
+    <button id="btnSaveSettings" type="button">Save settings</button>
+    <p id="settingsHint" hidden></p>
+  </section>
+
+  <section id="history" class="card">
+    <div class="history-head">
+      <h2>History</h2>
+      <button id="btnClearAll" type="button" class="secondary">Clear all</button>
+    </div>
+    <div id="historyList"></div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
