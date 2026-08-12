@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blurt — memorisation practice</title>
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
 <main class="container">
@@ -37,31 +37,31 @@
 
     <div id="viewPractice" hidden>
       <p class="notice">Text hidden — type it out from memory.</p>
-      <div class="timer-row"><span id="timer">00:00.0</span></div>
-      <label class="assisted-toggle"><input type="checkbox" id="assistedToggle"> Assisted mode — fill-in-the-blank hints for missed points</label>
-      <textarea id="typedText" rows="8" placeholder="Type the text from memory…"></textarea>
-      <p id="submitHint" hidden>Type something first.</p>
-      <div class="actions">
-        <button id="btnSubmit" type="button">Submit</button>
-        <button id="btnBack" type="button" class="secondary">Back</button>
+      <div id="practiceBody">
+        <div id="practiceMain">
+          <div class="timer-row"><span id="timer">00:00.0</span></div>
+          <label class="assisted-toggle"><input type="checkbox" id="assistedToggle"> Assisted mode — fill-in-the-blank hints for missed points</label>
+          <textarea id="typedText" rows="8" placeholder="Type the text from memory…"></textarea>
+          <p id="submitHint" hidden>Type something first.</p>
+          <div class="actions">
+            <button id="btnSubmit" type="button">Submit</button>
+            <button id="btnBack" type="button" class="secondary">Back</button>
+          </div>
+        </div>
+        <aside id="practiceHints" hidden>
+          <h3>Assisted recall</h3>
+          <p class="notice">You missed these last time — fill in the blanks from memory.</p>
+          <div id="practiceHintsList"></div>
+        </aside>
       </div>
     </div>
 
     <div id="viewResult" hidden>
       <p id="summary"></p>
-      <div id="resultBody">
-        <div id="resultMain">
-          <h3>Original</h3>
-          <p id="originalOut" class="diff"></p>
-          <h3>Typed</h3>
-          <p id="typedOut" class="diff"></p>
-        </div>
-        <aside id="helpArea" hidden>
-          <h3>Assisted recall</h3>
-          <p class="notice">Fill in the blanks from memory.</p>
-          <div id="helpList"></div>
-        </aside>
-      </div>
+      <h3>Original</h3>
+      <p id="originalOut" class="diff"></p>
+      <h3>Typed</h3>
+      <p id="typedOut" class="diff"></p>
       <div class="actions">
         <button id="btnAgain" type="button">Try again</button>
         <button id="btnNew" type="button" class="secondary">New text</button>
@@ -109,6 +109,6 @@
     <div id="historyList"></div>
   </section>
 </main>
-<script src="app.js?v=3"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

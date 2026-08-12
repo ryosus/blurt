@@ -88,23 +88,23 @@ textarea:focus {
   cursor: pointer;
 }
 
-#resultBody {
+#practiceBody {
   display: flex;
   gap: 20px;
 }
 
-#resultMain {
+#practiceMain {
   flex: 1;
   min-width: 0;
 }
 
-#helpArea {
+#practiceHints {
   flex: 0 0 260px;
   border-left: 1px solid #dde2e8;
   padding-left: 16px;
 }
 
-#helpArea .notice {
+#practiceHints .notice {
   margin-bottom: 10px;
 }
 
@@ -121,11 +121,11 @@ textarea:focus {
 }
 
 @media (max-width: 640px) {
-  #resultBody {
+  #practiceBody {
     flex-direction: column;
   }
 
-  #helpArea {
+  #practiceHints {
     flex: none;
     border-left: none;
     border-top: 1px solid #dde2e8;
