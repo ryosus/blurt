@@ -77,6 +77,63 @@ textarea:focus {
   color: #616e7c;
 }
 
+/* Assisted mode */
+.assisted-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  color: #52606d;
+  cursor: pointer;
+}
+
+#resultBody {
+  display: flex;
+  gap: 20px;
+}
+
+#resultMain {
+  flex: 1;
+  min-width: 0;
+}
+
+#helpArea {
+  flex: 0 0 260px;
+  border-left: 1px solid #dde2e8;
+  padding-left: 16px;
+}
+
+#helpArea .notice {
+  margin-bottom: 10px;
+}
+
+.cloze {
+  margin: 0 0 12px;
+  line-height: 1.8;
+}
+
+.cloze-blank {
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #2e7d32;
+  border-bottom: 1px solid #2e7d32;
+}
+
+@media (max-width: 640px) {
+  #resultBody {
+    flex-direction: column;
+  }
+
+  #helpArea {
+    flex: none;
+    border-left: none;
+    border-top: 1px solid #dde2e8;
+    padding-left: 0;
+    padding-top: 12px;
+  }
+}
+
 /* Saved texts */
 .saved-row,
 .saved-save-row,

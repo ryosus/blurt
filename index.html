@@ -38,6 +38,7 @@
     <div id="viewPractice" hidden>
       <p class="notice">Text hidden — type it out from memory.</p>
       <div class="timer-row"><span id="timer">00:00.0</span></div>
+      <label class="assisted-toggle"><input type="checkbox" id="assistedToggle"> Assisted mode — fill-in-the-blank hints for missed points</label>
       <textarea id="typedText" rows="8" placeholder="Type the text from memory…"></textarea>
       <p id="submitHint" hidden>Type something first.</p>
       <div class="actions">
@@ -48,10 +49,19 @@
 
     <div id="viewResult" hidden>
       <p id="summary"></p>
-      <h3>Original</h3>
-      <p id="originalOut" class="diff"></p>
-      <h3>Typed</h3>
-      <p id="typedOut" class="diff"></p>
+      <div id="resultBody">
+        <div id="resultMain">
+          <h3>Original</h3>
+          <p id="originalOut" class="diff"></p>
+          <h3>Typed</h3>
+          <p id="typedOut" class="diff"></p>
+        </div>
+        <aside id="helpArea" hidden>
+          <h3>Assisted recall</h3>
+          <p class="notice">Fill in the blanks from memory.</p>
+          <div id="helpList"></div>
+        </aside>
+      </div>
       <div class="actions">
         <button id="btnAgain" type="button">Try again</button>
         <button id="btnNew" type="button" class="secondary">New text</button>

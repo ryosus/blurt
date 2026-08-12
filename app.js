@@ -35,6 +35,9 @@ const customKey = document.getElementById('customKey');
 const customModel = document.getElementById('customModel');
 const btnSaveSettings = document.getElementById('btnSaveSettings');
 const settingsHint = document.getElementById('settingsHint');
+const assistedToggle = document.getElementById('assistedToggle');
+const helpArea = document.getElementById('helpArea');
+const helpList = document.getElementById('helpList');
 
 const views = {
   setup: document.getElementById('viewSetup'),
@@ -300,6 +303,22 @@ function importSavedTexts(file) {
   reader.readAsText(file);
 }
 
+// ---------- Assisted mode preference ----------
+const ASSISTED_KEY = 'blurt.assisted';
+let assisted = loadAssisted();
+
+function loadAssisted() {
+  return localStorage.getItem(ASSISTED_KEY) === '1';
+}
+
+function persistAssisted() {
+  try {
+    localStorage.setItem(ASSISTED_KEY, assisted ? '1' : '0');
+  } catch (err) {
+    console.warn('blurt: could not save assisted preference', err);
+  }
+}
+
 // ---------- Views ----------
 function showView(name) {
   if (name === 'practice') {
@@ -316,6 +335,7 @@ function enterPractice() {
   startTime = null;
   typedTextEl.value = '';
   submitHint.hidden = true;
+  assistedToggle.checked = assisted;
   timerEl.textContent = '00:00.0';
   stopTimer();
   timerInterval = setInterval(updateTimer, 100);
@@ -344,11 +364,13 @@ function updateTimer() {
 function buildLlmRequest(original, typed) {
   const user = 'ORIGINAL:\n' + original + '\n\nATTEMPT:\n' + typed + '\n\n' +
     'Respond with JSON only:\n' +
-    '{"points_total": <number>, "points_missed": <number>, "missing": ["<exact quote from ORIGINAL>", ...], "fabricated": ["<exact quote from ATTEMPT>", ...]}\n\n' +
+    '{"points_total": <number>, "points_missed": <number>, "missing": ["<exact quote from ORIGINAL>", ...], "fabricated": ["<exact quote from ATTEMPT>", ...], "clozed": ["<missing point with keywords blanked>", ...]}\n\n' +
     '- points_total: number of distinct points/ideas in ORIGINAL.\n' +
     '- points_missed: how many of those are absent from ATTEMPT.\n' +
     '- missing: the smallest contiguous quotes from ORIGINAL covering exactly the forgotten points. Quote the smallest span that contains the omitted idea (a clause, not a whole sentence, when only part is omitted). Empty array if none.\n' +
     '- fabricated: the smallest contiguous quotes from ATTEMPT covering invented or meaning-changing content. Empty array if none.\n' +
+    '- clozed: same length and in the same order as missing. For each missing point, rewrite it as a fill-in-the-blank exercise: replace the 1-3 most important keywords (names, dates, numbers, technical terms) with ___. Keep every other word and punctuation exactly.\n' +
+    '- EXAMPLE: for the missing point \'The Declaration of the Rights of Man was issued in August 1789.\', a good clozed value is \'The Declaration of the ___ of Man was issued in ___ 1789.\' The clozed value MUST differ from the missing quote because of the ___ replacements.\n' +
     '- missing and fabricated arrays may be empty but must be present.';
   const base = {
     messages: [
@@ -419,6 +441,7 @@ async function callLlmCompare(original, typed) {
     pointsMissed: Number(parsed.points_missed) || 0,
     missing: Array.isArray(parsed.missing) ? parsed.missing : [],
     fabricated: Array.isArray(parsed.fabricated) ? parsed.fabricated : [],
+    clozed: Array.isArray(parsed.clozed) ? parsed.clozed : [],
   };
 }
 
@@ -487,6 +510,8 @@ function semanticResult(llm) {
     missIdx: quoteToTokenIdx(sourceText, llm.missing),
     extraIdx: quoteToTokenIdx(typedTextEl.value, llm.fabricated),
     fabricatedCount: llm.fabricated.length,
+    clozed: llm.clozed,
+    missingQuotes: llm.missing,
   };
 }
 
@@ -619,6 +644,60 @@ function renderResult(result, durationMs, note, mode) {
       : '');
   renderDiff(originalOut, sourceText, result.missIdx, 'w-miss');
   renderDiff(typedOut, typedTextEl.value, result.extraIdx, 'w-extra');
+  renderHelpArea(result, mode);
+}
+
+// ---------- Assisted mode ----------
+// Words never worth blanking in the client-side cloze fallback.
+const STOPWORDS = new Set(('a an and are as at be by for from had has have in is it its of on or that the these those this to was were with which who not no so if then than too very will just').split(' '));
+
+// Fallback when the LLM returns no/wrong clozed array: blank content words
+// (non-stopwords of 4+ chars, or anything containing a digit) in each quote.
+function clientCloze(quote) {
+  const toks = tokenize(quote);
+  return toks.map((tok) => {
+    const clean = stripPunct(tok);
+    if (/\d/.test(clean)) return '___';
+    if (clean.length >= 4 && !STOPWORDS.has(clean)) return '___';
+    return tok;
+  }).join(' ');
+}
+
+// Render one cloze string; ___ runs become highlighted spans.
+function renderCloze(container, text) {
+  const frag = document.createDocumentFragment();
+  text.split('___').forEach((part, i) => {
+    if (i > 0) {
+      const blank = document.createElement('span');
+      blank.className = 'cloze-blank';
+      blank.textContent = '___';
+      frag.appendChild(blank);
+    }
+    frag.appendChild(document.createTextNode(part));
+  });
+  container.appendChild(frag);
+}
+
+function renderHelpArea(result, mode) {
+  helpList.replaceChildren();
+  if (mode !== 'semantic' || !assisted || result.missIdx.length === 0) {
+    helpArea.hidden = true;
+    return;
+  }
+  // Prefer the LLM's cloze; fall back to per-quote client cloze when the
+  // model returned nothing, a mismatched count, or unblanked copies of the
+  // quotes (the observed non-compliance mode).
+  const quotes = result.missingQuotes || [];
+  const clozed = (result.clozed || []).filter((c) => typeof c === 'string' && c !== '');
+  const useLlm = clozed.length === quotes.length && clozed.length > 0 &&
+    clozed.every((c, i) => c.includes('___') && c !== quotes[i]);
+  quotes.forEach((quote, i) => {
+    const p = document.createElement('p');
+    p.className = 'cloze';
+    renderCloze(p, useLlm ? clozed[i] : clientCloze(quote));
+    helpList.appendChild(p);
+  });
+  helpArea.hidden = false;
 }
 
 // ---------- Events ----------
@@ -703,6 +782,11 @@ typedTextEl.addEventListener('input', () => {
   if (startTime === null && typedTextEl.value.trim() !== '') {
     startTime = performance.now();
   }
+});
+
+assistedToggle.addEventListener('change', () => {
+  assisted = assistedToggle.checked;
+  persistAssisted();
 });
 
 btnBack.addEventListener('click', () => {
