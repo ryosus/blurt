@@ -23,6 +23,9 @@ const btnAgain = document.getElementById('btnAgain');
 const btnNew = document.getElementById('btnNew');
 const historyList = document.getElementById('historyList');
 const btnClearAll = document.getElementById('btnClearAll');
+const btnHelp = document.getElementById('btnHelp');
+const helpModal = document.getElementById('helpModal');
+const btnHelpClose = document.getElementById('btnHelpClose');
 const providerSelect = document.getElementById('providerSelect');
 const localFields = document.getElementById('localFields');
 const localUrl = document.getElementById('localUrl');
@@ -35,7 +38,7 @@ const customKey = document.getElementById('customKey');
 const customModel = document.getElementById('customModel');
 const btnSaveSettings = document.getElementById('btnSaveSettings');
 const settingsHint = document.getElementById('settingsHint');
-const assistedToggle = document.getElementById('assistedToggle');
+const assistedLevelEl = document.getElementById('assistedLevel');
 const practiceHints = document.getElementById('practiceHints');
 const practiceHintsList = document.getElementById('practiceHintsList');
 
@@ -305,15 +308,23 @@ function importSavedTexts(file) {
 
 // ---------- Assisted mode preference ----------
 const ASSISTED_KEY = 'blurt.assisted';
+// Difficulty levels: easy (about half the words shown), normal (about a
+// quarter), hard (about a tenth). Keywords — words containing digits — are
+// never shown at any level; you must recall those yourself.
+const ASSISTED_LEVELS = ['off', 'easy', 'normal', 'hard'];
 let assisted = loadAssisted();
 
 function loadAssisted() {
-  return localStorage.getItem(ASSISTED_KEY) === '1';
+  const raw = localStorage.getItem(ASSISTED_KEY);
+  // Legacy boolean preference: '1' was the aggressive cloze (~10% shown),
+  // closest to today's hard level.
+  if (raw === '1') return 'hard';
+  return ASSISTED_LEVELS.includes(raw) ? raw : 'off';
 }
 
 function persistAssisted() {
   try {
-    localStorage.setItem(ASSISTED_KEY, assisted ? '1' : '0');
+    localStorage.setItem(ASSISTED_KEY, assisted);
   } catch (err) {
     console.warn('blurt: could not save assisted preference', err);
   }
@@ -335,7 +346,7 @@ function enterPractice() {
   startTime = null;
   typedTextEl.value = '';
   submitHint.hidden = true;
-  assistedToggle.checked = assisted;
+  assistedLevelEl.value = assisted;
   renderPracticeHints();
   timerEl.textContent = '00:00.0';
   stopTimer();
@@ -644,30 +655,34 @@ function renderResult(result, durationMs, note, mode) {
 }
 
 // ---------- Assisted mode ----------
-// Hints from the most recent semantic comparison: the missed points, shown
-// as aggressive cloze during the NEXT practice attempt.
+// Hints from the most recent semantic comparison: the missed points, cloze'd
+// at the chosen difficulty level during the NEXT practice attempt.
 let hintPoints = [];
 let hintText = '';
 
-// Aggressive cloze (~90% blanked): keep tokens containing digits, plus a
-// single content anchor per line — the first word of 4+ chars, falling back
-// to the last such word — so each point still has a minimal hint.
-function clientCloze(quote) {
+// Fraction of non-keyword words shown at each level.
+const ASSISTED_FRACTIONS = { easy: 0.5, normal: 0.25, hard: 0.1 };
+
+// Cloze a missed quote at the chosen difficulty: the level's fraction of the
+// non-keyword words is shown, picked at random. Keywords — tokens containing
+// digits (dates, years, quantities) — are always blanked: they are the facts
+// to recall. Short quotes still get at least one word shown when any exists.
+function clientCloze(quote, level) {
   const toks = tokenize(quote);
-  const keep = new Set();
+  const fraction = ASSISTED_FRACTIONS[level] ?? 0.1;
+  const candidates = [];
   for (let i = 0; i < toks.length; i++) {
-    if (/\d/.test(stripPunct(toks[i]))) keep.add(i);
+    if (/\d/.test(stripPunct(toks[i]))) continue; // keyword: never shown
+    candidates.push(i);
   }
-  if (toks.length > 0 && keep.size === 0) {
-    for (let i = 0; i < toks.length; i++) {
-      if (stripPunct(toks[i]).length >= 4 || /\d/.test(stripPunct(toks[i]))) { keep.add(i); break; }
-    }
+  const count =
+    candidates.length === 0 ? 0 : Math.max(1, Math.round(candidates.length * fraction));
+  // Fisher–Yates shuffle, then keep the first `count` indices.
+  for (let i = candidates.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
   }
-  if (toks.length > 0 && keep.size === 0) {
-    for (let i = toks.length - 1; i >= 0; i--) {
-      if (stripPunct(toks[i]).length >= 4 || /\d/.test(stripPunct(toks[i]))) { keep.add(i); break; }
-    }
-  }
+  const keep = new Set(candidates.slice(0, count));
   return toks.map((tok, i) => keep.has(i) ? tok : '___').join(' ');
 }
 
@@ -688,7 +703,7 @@ function renderCloze(container, text) {
 
 function renderPracticeHints() {
   practiceHintsList.replaceChildren();
-  if (!assisted || hintPoints.length === 0 || hintText !== sourceText) {
+  if (assisted === 'off' || hintPoints.length === 0 || hintText !== sourceText) {
     practiceHints.hidden = true;
     return;
   }
@@ -785,8 +800,8 @@ typedTextEl.addEventListener('input', () => {
   }
 });
 
-assistedToggle.addEventListener('change', () => {
-  assisted = assistedToggle.checked;
+assistedLevelEl.addEventListener('change', () => {
+  assisted = assistedLevelEl.value;
   persistAssisted();
   renderPracticeHints();
 });
@@ -836,7 +851,7 @@ btnSubmit.addEventListener('click', async () => {
   // Semantic comparisons update the assisted-recall hints for the next attempt
   // (a perfect attempt clears them). Token-mode failures leave prior hints.
   if (mode === 'semantic') {
-    hintPoints = result.missingQuotes.map(clientCloze);
+    hintPoints = result.missingQuotes.map((quote) => clientCloze(quote, assisted));
     hintText = sourceText;
   }
   renderResult(result, durationMs, note, mode);
@@ -888,6 +903,28 @@ btnSaveSettings.addEventListener('click', () => {
     settingsHint.hidden = true;
     settingsHint.classList.remove('ok');
   }, 2000);
+});
+
+// ---------- Help ----------
+function openHelp() {
+  helpModal.hidden = false;
+  document.body.classList.add('modal-open');
+  btnHelpClose.focus();
+}
+
+function closeHelp() {
+  helpModal.hidden = true;
+  document.body.classList.remove('modal-open');
+  btnHelp.focus();
+}
+
+btnHelp.addEventListener('click', openHelp);
+btnHelpClose.addEventListener('click', closeHelp);
+helpModal.addEventListener('click', (e) => {
+  if (e.target === helpModal) closeHelp(); // backdrop click
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !helpModal.hidden) closeHelp();
 });
 
 // ---------- History ----------

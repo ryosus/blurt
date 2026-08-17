@@ -4,12 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blurt — memorisation practice</title>
-<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
 <main class="container">
-  <h1>Blurt</h1>
-  <p class="tagline">Paste text, type it from memory, compare.</p>
+  <header class="app-head">
+    <div>
+      <h1>Blurt</h1>
+      <p class="tagline">Paste text, type it from memory, compare.</p>
+    </div>
+    <button id="btnHelp" type="button" class="secondary" title="How to use Blurt">How to use</button>
+  </header>
 
   <section id="practiceCard" class="card">
     <div id="viewSetup">
@@ -40,7 +45,14 @@
       <div id="practiceBody">
         <div id="practiceMain">
           <div class="timer-row"><span id="timer">00:00.0</span></div>
-          <label class="assisted-toggle"><input type="checkbox" id="assistedToggle"> Assisted mode — fill-in-the-blank hints for missed points</label>
+          <label class="assisted-toggle">Assisted mode — fill-in-the-blank hints for missed points
+            <select id="assistedLevel" aria-label="Assisted mode level">
+              <option value="off">Off</option>
+              <option value="easy">Easy — about half the words shown</option>
+              <option value="normal">Normal — about a quarter shown</option>
+              <option value="hard">Hard — about a tenth shown</option>
+            </select>
+          </label>
           <textarea id="typedText" rows="8" placeholder="Type the text from memory…"></textarea>
           <p id="submitHint" hidden>Type something first.</p>
           <div class="actions">
@@ -109,6 +121,45 @@
     <div id="historyList"></div>
   </section>
 </main>
-<script src="app.js?v=4"></script>
+
+<div id="helpModal" class="modal-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal-head">
+      <h2 id="helpTitle">How to use Blurt</h2>
+      <button id="btnHelpClose" type="button" class="modal-close" aria-label="Close help">×</button>
+    </div>
+    <div class="modal-body">
+      <p>Blurt helps you memorise a passage: paste it, then type it out from memory. Blurt compares your attempt with the original and shows exactly what you missed, so you know what to practise next.</p>
+
+      <h3>Practice flow</h3>
+      <ol>
+        <li><strong>Start</strong> — paste or type the text to memorise in the <em>Text to memorise</em> box, then press <em>Start practice</em>.</li>
+        <li><strong>Practise</strong> — the original is hidden. Type the passage out from memory; the timer starts on your first keystroke.</li>
+        <li><strong>Submit</strong> — press <em>Submit</em> when you're done. Blurt compares your attempt with the original.</li>
+        <li><strong>Review</strong> — the result shows your score, the original with missed parts crossed out, and your attempt with added parts highlighted. Use <em>Try again</em> to practise the same text once more, or <em>New text</em> to return to the start screen.</li>
+      </ol>
+
+      <h3>How the comparison works</h3>
+      <p>Blurt compares your attempt in one of two ways:</p>
+      <ul>
+        <li><strong>AI comparison (meaning-based)</strong> — the default. A language model reads both texts and judges meaning rather than wording: synonyms, reordered phrases, and different grammar still count as remembered. You get a score in points (&ldquo;You remembered X of Y points&rdquo;). Missing ideas are crossed out in the original, and anything you added that isn't in the original is highlighted in your attempt. This comparison also feeds the Assisted mode hints below.</li>
+        <li><strong>Word-for-word comparison (fallback)</strong> — used automatically when the model can't be reached (offline, no model running, or a failed request). Blurt lines up the two texts word by word — ignoring capitalisation and punctuation at the ends of words — and scores how many words you got right. The result shows a note saying the word-level comparison was used.</li>
+      </ul>
+
+      <h3>Assisted mode</h3>
+      <p>After an AI comparison, the points you missed are kept as hints. On your next attempt, pick a difficulty: <em>Easy</em> (about half the words shown), <em>Normal</em> (about a quarter), or <em>Hard</em> (about a tenth). Keywords — dates and numbers — are always blanked: those are the facts to recall. A perfect attempt clears the hints.</p>
+
+      <h3>Saved texts</h3>
+      <p>Save a text under a label with <em>Save text</em>, then reload it any time from the dropdown. <em>Export texts</em> downloads your saved texts as a JSON file; <em>Import texts</em> merges a JSON file back in — new labels are added, existing labels are overwritten.</p>
+
+      <h3>Model provider</h3>
+      <p>The AI comparison needs a model. Three options: <em>Local llama.cpp</em> (a local endpoint URL), <em>DeepSeek API</em> (an API key and model name), or <em>Custom</em> (any OpenAI-compatible endpoint). Settings are stored in your browser. If no model can be reached, Blurt falls back to the word-for-word comparison.</p>
+
+      <h3>History</h3>
+      <p>Every attempt is recorded with its date, time taken, and score. Attempts are grouped by saved-text label (or by text). Click a group to load that text back into the start screen; the × button deletes one attempt; <em>Clear all</em> wipes the history.</p>
+    </div>
+  </div>
+</div>
+<script src="app.js?v=5"></script>
 </body>
 </html>
