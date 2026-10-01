@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blurt — memorisation practice</title>
-<link rel="stylesheet" href="styles.css?v=5">
+<link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
 <main class="container">
@@ -41,6 +41,7 @@
     </div>
 
     <div id="viewPractice" hidden>
+      <h3 id="practiceTitle" hidden></h3>
       <p class="notice">Text hidden — type it out from memory.</p>
       <div id="practiceBody">
         <div id="practiceMain">
@@ -134,7 +135,7 @@
       <h3>Practice flow</h3>
       <ol>
         <li><strong>Start</strong> — paste or type the text to memorise in the <em>Text to memorise</em> box, then press <em>Start practice</em>.</li>
-        <li><strong>Practise</strong> — the original is hidden. Type the passage out from memory; the timer starts on your first keystroke.</li>
+        <li><strong>Practise</strong> — the original is hidden. Type the passage out from memory; the timer starts on your first keystroke. If the passage is a saved text, its label is shown above the typing box.</li>
         <li><strong>Submit</strong> — press <em>Submit</em> when you're done. Blurt compares your attempt with the original.</li>
         <li><strong>Review</strong> — the result shows your score, the original with missed parts crossed out, and your attempt with added parts highlighted. Use <em>Try again</em> to practise the same text once more, or <em>New text</em> to return to the start screen.</li>
       </ol>
@@ -160,6 +161,6 @@
     </div>
   </div>
 </div>
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>

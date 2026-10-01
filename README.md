@@ -5,7 +5,7 @@ Memorisation practice: paste a text, type it out from memory, and compare. Works
 ## How it works
 
 1. **Start** — paste or type the text you want to memorise in the *Text to memorise* box, optionally save it under a label, then press *Start practice*.
-2. **Practise** — the original text is hidden. Type it out from memory; the timer starts on your first keystroke. Optionally enable *Assisted mode* for fill-in-the-blank hints of what you missed last time.
+2. **Practise** — the original text is hidden. Type it out from memory; the timer starts on your first keystroke. If the text is one of your saved texts, its label is shown above the typing box so you know what you're practising. Optionally enable *Assisted mode* for fill-in-the-blank hints of what you missed last time.
 3. **Submit** — Blurt compares your attempt with the original.
 4. **Review** — the result shows your score, the original with missed parts crossed out, and your attempt with added parts highlighted.
 

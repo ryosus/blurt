@@ -89,6 +89,12 @@ textarea:focus {
   color: #616e7c;
 }
 
+/* Saved-text label shown while blurting */
+#practiceTitle {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+}
+
 /* Assisted mode */
 .assisted-toggle {
   display: flex;

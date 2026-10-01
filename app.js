@@ -41,6 +41,7 @@ const settingsHint = document.getElementById('settingsHint');
 const assistedLevelEl = document.getElementById('assistedLevel');
 const practiceHints = document.getElementById('practiceHints');
 const practiceHintsList = document.getElementById('practiceHintsList');
+const practiceTitleEl = document.getElementById('practiceTitle');
 
 const views = {
   setup: document.getElementById('viewSetup'),
@@ -119,6 +120,14 @@ function findSavedByLabel(label) {
 // Exact-text lookup: used at submit time to tag a record with a label.
 function findSavedByText(text) {
   return savedTexts.find((s) => s.text === text);
+}
+
+// Label of the saved text that `text` was loaded from, or '' when unsaved.
+// Saved texts are stored trimmed, so a raw textarea value with surrounding
+// whitespace still matches; imported texts may keep their original padding.
+function savedLabelForText(text) {
+  const match = findSavedByText(text) || findSavedByText(text.trim());
+  return match ? match.label : '';
 }
 
 // ---------- Provider settings persistence ----------
@@ -346,6 +355,10 @@ function enterPractice() {
   startTime = null;
   typedTextEl.value = '';
   submitHint.hidden = true;
+  // Show which saved text is being blurted; unsaved texts show no title.
+  const label = savedLabelForText(sourceText);
+  practiceTitleEl.textContent = label;
+  practiceTitleEl.hidden = label === '';
   assistedLevelEl.value = assisted;
   renderPracticeHints();
   timerEl.textContent = '00:00.0';
